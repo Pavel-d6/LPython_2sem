@@ -1,49 +1,39 @@
-import pytest
 
+import pytest
 from task import Task
 from protocol import TaskSource, validate_source
 
 
 class ValidSource:
-    """Корректная реализация контракта."""
     def get_tasks(self) -> list[Task]:
-        return [Task(id="t1", payload="data")]
-
+        return [Task(id="t1", description="тест", priority=5, payload="data")]
 
 class InvalidSource:
-    """Объект без метода get_tasks."""
     def fetch(self) -> list[Task]:
         return []
 
-
 class EmptySource:
-    """Корректный источник, возвращающий пустой список."""
     def get_tasks(self) -> list[Task]:
         return []
 
 
 class TestTaskSourceProtocol:
     def test_valid_source_is_instance_of_protocol(self) -> None:
-        source = ValidSource()
-        assert isinstance(source, TaskSource)
+        assert isinstance(ValidSource(), TaskSource)
 
     def test_invalid_source_is_not_instance_of_protocol(self) -> None:
-        source = InvalidSource()
-        assert not isinstance(source, TaskSource)
+        assert not isinstance(InvalidSource(), TaskSource)
 
     def test_empty_source_satisfies_protocol(self) -> None:
-        source = EmptySource()
-        assert isinstance(source, TaskSource)
+        assert isinstance(EmptySource(), TaskSource)
 
     def test_validate_source_accepts_valid(self) -> None:
-        source = ValidSource()
-        result = validate_source(source)
-        assert result is source
+        s = ValidSource()
+        assert validate_source(s) is s
 
     def test_validate_source_rejects_invalid(self) -> None:
-        source = InvalidSource()
         with pytest.raises(TypeError, match="не реализует протокол TaskSource"):
-            validate_source(source)
+            validate_source(InvalidSource())
 
     def test_validate_source_rejects_plain_object(self) -> None:
         with pytest.raises(TypeError):
@@ -53,7 +43,6 @@ class TestTaskSourceProtocol:
         with pytest.raises(TypeError):
             validate_source("not a source")
 
-    def test_validate_source_error_message_contains_class_name(self) -> None:
-        source = InvalidSource()
+    def test_error_message_contains_class_name(self) -> None:
         with pytest.raises(TypeError, match="InvalidSource"):
-            validate_source(source)
+            validate_source(InvalidSource())

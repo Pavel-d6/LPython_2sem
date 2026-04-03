@@ -6,16 +6,25 @@ app = Flask(__name__)
 
 def _generate_tasks(count: int = 10) -> list[dict]:
     templates = [
-        lambda i: {"action": "process_order",     "order_id": 1000 + i},
+        lambda i: {"action": "process_order",    "order_id": 1000 + i},
         lambda i: {"action": "send_notification", "user_id": i},
         lambda i: {"action": "recalculate_stats", "period": f"2024-Q{(i % 4) + 1}"},
         lambda i: {"action": "check_resource",    "resource": f"service-{i}"},
         lambda i: {"action": "process_incoming",  "source": f"webhook-{i}"},
     ]
+    descriptions = [
+        "обработать входящий заказ",
+        "отправить уведомление пользователю",
+        "пересчитать статистику за период",
+        "проверить состояние ресурса",
+        "обработать входящие данные",
+    ]
     return [
         {
-            "id": f"task-{i:03d}",
-            "payload": templates[i % len(templates)](i),
+            "id":          f"task-{i:03d}",
+            "description": descriptions[i % len(descriptions)],
+            "priority":    (i % 10) + 1,
+            "payload":     templates[i % len(templates)](i),
         }
         for i in range(count)
     ]
@@ -23,13 +32,11 @@ def _generate_tasks(count: int = 10) -> list[dict]:
 
 @app.get("/tasks")
 def get_tasks():
-    """Возвращает список всех задач."""
     return jsonify(_generate_tasks())
 
 
 @app.get("/tasks/<task_id>")
 def get_task(task_id: str):
-    """Возвращает одну задачу по id."""
     task = next((t for t in _generate_tasks() if t["id"] == task_id), None)
     if task is None:
         abort(404, description=f"Задача '{task_id}' не найдена")

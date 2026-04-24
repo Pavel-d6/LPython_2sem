@@ -3,19 +3,19 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from exceptions import TaskValidationError, InvalidStatusTransitionError, InvalidPriorityError
+from exceptions import TaskValidationError, InvalidStatusTransitionError
 from descriptors import ValidatedString, ValidatedPriority
 
 
 class Status(Enum):
     """Жизненный цикл задачи"""
-    PENDING     = "pending"
+    PENDING = "pending"
     IN_PROGRESS = "in_progress"
-    DONE        = "done"
+    DONE = "done"
 
 
 _ALLOWED_TRANSITIONS: dict[Status, Status] = {
-    Status.PENDING:     Status.IN_PROGRESS,
+    Status.PENDING: Status.IN_PROGRESS,
     Status.IN_PROGRESS: Status.DONE,
 }
 
@@ -26,7 +26,7 @@ class Task:
     """
 
     description = ValidatedString()
-    priority    = ValidatedPriority()
+    priority = ValidatedPriority()
 
     def __init__(
         self,
@@ -42,13 +42,13 @@ class Task:
         if payload is None:
             raise TaskValidationError("'payload' не может быть None")
 
-        self._id         = id
-        self._payload    = payload
-        self._status     = Status.PENDING
+        self._id = id
+        self._payload = payload
+        self._status = Status.PENDING
         self._created_at = datetime.now()
 
         self.description = description
-        self.priority    = priority
+        self.priority = priority
 
     @property
     def id(self) -> str:

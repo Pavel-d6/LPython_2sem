@@ -29,3 +29,33 @@ def validate_source(source: object) -> TaskSource:
             f"Необходим метод get_tasks()."
         )
     return source  
+
+
+@runtime_checkable
+class TaskHandler(Protocol):
+    """
+    Протокол обработчика задач.
+    """
+
+    async def handle(self, task: Task) -> None:
+        """
+        Асинхронно обрабатывает задачу.
+
+        Args:
+            task: Задача для обработки.
+        """
+        ...
+
+def validate_handler(handler: object) -> TaskHandler:
+    """
+    Runtime-проверка соответствия объекта контракту TaskHandler.
+
+    Args:
+        handler: Проверяемый объект.
+    """
+    if not isinstance(handler, TaskHandler):
+        raise TypeError(
+            f"Объект типа '{type(handler).__name__}' не реализует протокол TaskHandler. "
+            f"Необходим асинхронный метод handle(task: Task) -> None."
+        )
+    return handler

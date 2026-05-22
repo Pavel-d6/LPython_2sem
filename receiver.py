@@ -8,13 +8,6 @@ class TaskReceiver:
         self._sources: list[TaskSource] = []
 
 
-    def register(self, source: object) -> None:
-        """
-        Регистрирует источник задач после  проверки контракта.
-        """
-
-        validated = validate_source(source)
-        self._sources.append(validated)
 
     def register(self, source: object) -> None:
         """

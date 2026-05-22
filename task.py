@@ -34,6 +34,7 @@ class Task:
         description: str,
         priority: int,
         payload: Any,
+        task_type="default"
     ) -> None:
         if not isinstance(id, str):
             raise TypeError(f"'id' должен быть строкой, получено: {type(id).__name__}")
@@ -46,6 +47,7 @@ class Task:
         self._payload = payload
         self._status = Status.PENDING
         self._created_at = datetime.now()
+        self._task_type = task_type
 
         self.description = description
         self.priority = priority
@@ -74,6 +76,11 @@ class Task:
     def is_ready(self) -> bool:
         """True если задача ожидает выполнения (статус PENDING)."""
         return self._status == Status.PENDING
+    
+    @property
+    def task_type(self) -> str:
+        """Тип обработчика задачи."""
+        return self._task_type
 
     def start(self) -> None:
         """PENDING → IN_PROGRESS."""
